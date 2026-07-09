@@ -31,5 +31,10 @@
     "require-dev": {
         "sanity/sanity-php": "^1.5",
         "phpunit/phpunit": "^13.2"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Support\\": "tests/Support/"
+        }
     }
 }

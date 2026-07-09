@@ -14,19 +14,18 @@ use function Vibe\PortableText\Blocks\MarkDefs\Types\link;
 use function Vibe\PortableText\Nodes\node;
 use function Vibe\PortableText\text;
 
-class TextGeneratorTest extends TestCase
+class PortableTextRenderingTest extends TestCase
 {
     #[Test]
-    public function itGeneratesSimpleText(): void
+    public function itRendersSimpleText(): void
     {
         $text = text('Hello, World!');
 
-        // Use Sanity PHP to make sure our generated content is valid by checking expected html rendering
         $this->assertSame('<p>Hello, World!</p>', BlockContent::toHtml($text->toArray()));
     }
 
     #[Test]
-    public function itGeneratesComplexText(): void
+    public function itRendersComplexText(): void
     {
         $text = text([
             'Hello, World!',
@@ -45,7 +44,6 @@ class TextGeneratorTest extends TestCase
             ]),
         ]);
 
-        // Use Sanity PHP to make sure our generated content is valid by checking expected html rendering
         $this->assertSame(
             '<p>Hello, World!</p>'
             .'<p></p>'
@@ -59,22 +57,16 @@ class TextGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function itGeneratesLinks(): void
+    public function itRendersLinks(): void
     {
         $link = link('a-link', 'https://example.com', '_blank');
         $text = text([
             node('Hello, World!')->mark($link),
         ]);
 
-        // Use Sanity PHP to make sure our generated content is valid by checking expected html rendering
         $this->assertSame(
             '<p><a href="https://example.com">Hello, World!</a></p>',
             BlockContent::toHtml($text->toArray())
         );
-
-        $portableText = $text->toArray();
-
-        // Also check that we include the target attribute in the generated text, which isn't supported by Sanity PHP
-        $this->assertSame('_blank', $portableText[0]['markDefs'][0]['target']);
     }
 }

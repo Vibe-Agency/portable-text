@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vibe\PortableText\Blocks;
 
 use JsonSerializable;
+use Vibe\PortableText\Blocks\Lists\ListItem;
 use Vibe\PortableText\Blocks\Lists\ListTrait;
 use Vibe\PortableText\Blocks\MarkDefs\MarkDefsTrait;
 use Vibe\PortableText\Blocks\Styles\Style;
@@ -100,7 +101,7 @@ class Block implements JsonSerializable
         }
 
         if ($this->listItem) {
-            $arr['listItem'] = $this->listItem;
+            $arr['listItem'] = $this->listItem instanceof ListItem ? $this->listItem->value : $this->listItem;
         }
 
         if ($this->level) {
