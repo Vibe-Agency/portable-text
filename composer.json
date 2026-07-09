@@ -1,0 +1,35 @@
+{
+    "name": "vibe/portabletext",
+    "type": "library",
+    "description": "A PHP library for working with Portable Text",
+    "version": "0.0.1-dev",
+    "autoload": {
+        "psr-4": {
+            "Vibe\\PortableText\\": "src/"
+        },
+        "files": [
+            "src/helpers.php",
+            "src/Blocks/helpers.php",
+            "src/Blocks/Styles/helpers.php",
+            "src/Blocks/Types/helpers.php",
+            "src/Blocks/Lists/helpers.php",
+            "src/Blocks/MarkDefs/helpers.php",
+            "src/Blocks/MarkDefs/Types/helpers.php",
+            "src/Nodes/helpers.php",
+            "src/Nodes/Types/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Marc Coupland",
+            "email": "marcus@vibeagency.uk"
+        }
+    ],
+    "require": {
+        "php": "8.5"
+    },
+    "require-dev": {
+        "sanity/sanity-php": "^1.5",
+        "phpunit/phpunit": "^13.2"
+    }
+}

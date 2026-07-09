@@ -1,0 +1,6 @@
+/.junie
+/.phpunit.cache
+/.idea
+/vendor
+
+.DS_Store
