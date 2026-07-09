@@ -52,10 +52,10 @@ $json = json_encode($document);
 Portable Text is a recursive array structure. This library models it with four building blocks:
 
 | Class | Role | Serialized `_type` |
-|-------|------|--------------------|
+|-------|------|----------------|
 | `Text` | Root document; holds an ordered list of blocks | *(root array)* |
-| `Block` | A section of text — paragraph, heading, list item, etc. | `block` |
-| `Node` | An inline text span within a block | `span` |
+| `Block` | A section of text — paragraph, heading, list item, or custom block object | `block` (default), custom |
+| `Node` | An inline text span, or custom inline object | `span` (default), custom |
 | `MarkDef` | An annotation definition referenced by span marks (e.g. a link) | `link`, `comment`, custom |
 
 ```
@@ -298,6 +298,70 @@ markDef('comment-1', Type::Comment)
 
 Custom attributes are merged as top-level keys in the serialized output.
 
+### Custom block and inline types
+
+Portable Text supports custom content types beyond the built-in `block` and `span` defaults. The easiest way to configure them is with `type()` on `Block` and `Node` — no subclassing required.
+
+Use `type()` with any string to set the serialized `_type` value. Combine with `customAttribute()` to attach the data your schema expects:
+
+```php
+use function Vibe\PortableText\Blocks\block;
+use function Vibe\PortableText\Nodes\node;
+use function Vibe\PortableText\text;
+
+$document = text([
+    // Custom block object (e.g. an image embed)
+    block()
+        ->type('image')
+        ->customAttribute('asset', ['_ref' => 'image-123']),
+
+    // Custom inline object inside a text block
+    block([
+        node('AAPL')
+            ->type('stock-ticker')
+            ->customAttribute('symbol', 'AAPL'),
+    ]),
+]);
+```
+
+```json
+[
+  {
+    "_type": "image",
+    "_key": "text-0",
+    "style": "normal",
+    "markDefs": [],
+    "children": [],
+    "asset": { "_ref": "image-123" }
+  },
+  {
+    "_type": "block",
+    "_key": "text-1",
+    "style": "normal",
+    "markDefs": [],
+    "children": [
+      {
+        "_type": "stock-ticker",
+        "_key": "text-1-0",
+        "text": "AAPL",
+        "marks": [],
+        "symbol": "AAPL"
+      }
+    ]
+  }
+]
+```
+
+The built-in type enums (`Blocks\Types\Type::Block`, `Nodes\Types\Type::Span`) are defaults only. Passing a custom string overrides them:
+
+```php
+block('Paragraph')->type('block');   // default, equivalent to omitting type()
+node('text')->type('span');          // default, equivalent to omitting type()
+block()->type('code')->customAttribute('language', 'php');
+```
+
+Custom types work alongside all other fluent methods — styles, lists, marks, and custom attributes can be combined as needed.
+
 ### Custom mark definitions
 
 For annotations beyond links, use `markDef()`:
@@ -432,6 +496,7 @@ Each accepts `array|Node|string $children`.
 |--------|-------------|
 | `append(Node\|string $node): self` | Add a span |
 | `prepend(Node\|string $node): self` | Prepend a span |
+| `type(Blocks\Types\Type\|string $type): self` | Set block `_type` |
 | `style(Style\|string $style): self` | Set block style |
 | `normal()`, `heading1()`–`heading6()`, `quote()`, `div()` | Style shortcuts |
 | `listItem(ListItem\|string $listItem): self` | Set list type |
@@ -445,6 +510,7 @@ Each accepts `array|Node|string $children`.
 | Method | Description |
 |--------|-------------|
 | `text(string $text): self` | Set span text |
+| `type(Nodes\Types\Type\|string $type): self` | Set span `_type` |
 | `mark(MarkDef\|Mark\|string $mark): self` | Add a single mark |
 | `marks(array $marks): self` | Add multiple marks |
 | `customAttribute(string $name, mixed $value): self` | Add a custom attribute |
@@ -474,7 +540,19 @@ All core classes implement `JsonSerializable`. Both `toArray()` and `json_encode
 }
 ```
 
-Optional fields: `listItem`, `level`, and any custom attributes.
+`_type` defaults to `"block"` but can be any custom string (e.g. `"image"`, `"code"`). Optional fields: `listItem`, `level`, and any custom attributes.
+
+### Custom block shape
+
+```json
+{
+  "_type": "image",
+  "_key": "text-0",
+  "asset": { "_ref": "image-123" }
+}
+```
+
+Custom block objects still include builder defaults (`style`, `markDefs`, `children`) unless you configure them otherwise. Use `customAttribute()` for type-specific fields.
 
 ### Span shape
 
@@ -488,6 +566,20 @@ Optional fields: `listItem`, `level`, and any custom attributes.
 ```
 
 The `marks` array contains decorator strings (`"strong"`, `"em"`, etc.) and/or mark-def key strings for annotations.
+
+### Custom inline shape
+
+```json
+{
+  "_type": "stock-ticker",
+  "_key": "text-0-0",
+  "text": "AAPL",
+  "marks": [],
+  "symbol": "AAPL"
+}
+```
+
+`_type` defaults to `"span"` but can be any custom string for inline objects defined in your Portable Text schema.
 
 ### Mark definition shape
 
