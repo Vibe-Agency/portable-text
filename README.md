@@ -12,7 +12,8 @@ This package is a **builder only** — it writes Portable Text content. It does 
 ## Installation
 
 ```bash
-composer require vibe/portabletext
+composer config repositories.vibe/portable-text vcs git@github.com:Vibe-Agency/portable-text.git
+composer require vibe/portable-text
 ```
 
 ## Quick start

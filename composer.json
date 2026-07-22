@@ -1,5 +1,5 @@
 {
-    "name": "vibe/portabletext",
+    "name": "vibe/portable-text",
     "type": "library",
     "description": "A PHP library for working with Portable Text",
     "version": "0.0.1-dev",
